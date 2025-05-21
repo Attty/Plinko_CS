@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="Plinko_C.S.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-20T12:46:30.813873300Z">
+        <DropdownSelection timestamp="2025-05-21T10:27:47.714666100Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\vlad\.android\avd\Medium_Phone.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=46e3a152" />
             </handle>
           </Target>
         </DropdownSelection>

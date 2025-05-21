@@ -1,5 +1,6 @@
 package com.example.plinkocs.presentation.menu.screen
 
+import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -7,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,10 +31,12 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,40 +55,51 @@ fun MenuScreen(
     modifier: Modifier = Modifier,
     viewModel: MenuViewModel = viewModel()
 ) {
-
     val viewState = viewModel.viewState.value
     val isLoading = viewState.isLoading
+    val context = LocalContext.current
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val screenHeight = this.maxHeight
 
-    Box(modifier = Modifier.fillMaxSize()) {
+
+
+        val plinkoMasterPaddingTopFraction = 0.055f
+        val loadingBallOffsetYFraction = 0.09375f
+        val loadingTextPaddingBottomFraction = 0.055f
+
+
+        val plinkoBallOffsetYFraction = 0.2125f
+        val menuWindowBoxPaddingTopFraction = 0.15f
+        val menuButtonsColumnHeightFraction = 0.40375f
+
         Image(
             painter = painterResource(R.drawable.plinko_background),
             contentDescription = "background",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
         )
-        if (isLoading) {
 
+        if (isLoading) {
             Image(
                 painter = painterResource(R.drawable.plinko_bright_ball),
-                contentDescription = "plinko_ball",
+                contentDescription = "plinko_ball_loading",
                 modifier = Modifier
                     .fillMaxSize()
-                    .offset(y = 75.dp),
+                    .offset(y = screenHeight * loadingBallOffsetYFraction),
                 contentScale = ContentScale.FillHeight
-
             )
             Image(
                 painter = painterResource(R.drawable.plinko_master),
                 contentDescription = "plinko_master",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 44.dp),
+                    .padding(top = screenHeight * plinkoMasterPaddingTopFraction),
                 contentScale = ContentScale.FillWidth
             )
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 44.dp)
+                    .padding(bottom = screenHeight * loadingTextPaddingBottomFraction)
             ) {
                 Text(
                     text = "Loading...",
@@ -99,7 +114,6 @@ fun MenuScreen(
                     ),
                     color = Color.Black
                 )
-
                 Text(
                     text = "Loading...",
                     fontFamily = kickflipFont,
@@ -107,11 +121,10 @@ fun MenuScreen(
                     color = Color.White
                 )
             }
-
         } else {
             Image(
                 painter = painterResource(R.drawable.plinko_bright_ball),
-                contentDescription = "background",
+                contentDescription = "background_blur_ball",
                 modifier = Modifier
                     .fillMaxSize()
                     .blur(13.4.dp),
@@ -124,16 +137,15 @@ fun MenuScreen(
                     .fillMaxWidth()
                     .scale(1.8f)
                     .align(Alignment.BottomCenter)
-                    .offset(y = 170.dp),
+                    .offset(y = screenHeight * plinkoBallOffsetYFraction),
                 contentScale = ContentScale.FillWidth
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center)
-                    .padding(top = 120.dp)
+                    .padding(top = screenHeight * menuWindowBoxPaddingTopFraction)
             ) {
-
                 Image(
                     painter = painterResource(R.drawable.menu_window),
                     contentDescription = "menu_window",
@@ -141,7 +153,9 @@ fun MenuScreen(
                         .align(Alignment.Center)
                         .scale(2.5f)
                 )
+
                 AnimatedMenuButtons(
+                    columnHeight = screenHeight * menuButtonsColumnHeightFraction,
                     onPlayClick = {
                         navController.navigate(Destinations.Play)
                     },
@@ -149,7 +163,8 @@ fun MenuScreen(
                         navController.navigate(Destinations.Info)
                     },
                     onQuitClick = {
-
+                        val activity = context as? Activity
+                        activity?.finishAffinity()
                     }
                 )
             }
@@ -159,7 +174,7 @@ fun MenuScreen(
                 contentDescription = "plinko_master",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 44.dp),
+                    .padding(top = screenHeight * plinkoMasterPaddingTopFraction),
                 contentScale = ContentScale.FillWidth
             )
         }
@@ -168,15 +183,16 @@ fun MenuScreen(
 
 @Composable
 fun BoxScope.AnimatedMenuButtons(
+    columnHeight: Dp,
     onPlayClick: () -> Unit,
     onInfoClick: () -> Unit,
     onQuitClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
-            .height(323.dp)
+            .height(columnHeight)
             .align(Alignment.Center),
-        verticalArrangement = Arrangement.SpaceAround
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         AnimatedButton(
             text = "Play",
@@ -193,7 +209,7 @@ fun BoxScope.AnimatedMenuButtons(
         AnimatedButton(
             text = "Quit",
             buttonImage = R.drawable.menu_button,
-            onClick = { onQuitClick }
+            onClick = { onQuitClick() }
         )
     }
 }
@@ -205,20 +221,21 @@ fun AnimatedButton(
     isGameOver: Boolean = false,
     onClick: () -> Unit,
     scale: Float = 2.5f,
-    modifier: Modifier = Modifier // Додано параметр modifier
+    modifier: Modifier = Modifier
 ) {
     var isPressed by remember { mutableStateOf(false) }
     var isClickable by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
+
     val animatedScale by animateFloatAsState(
         targetValue = if (isPressed) scale * 0.85f else scale,
         animationSpec = tween(durationMillis = 100),
         label = "scale"
     )
+
     val verticalPadding = if (isGameOver) 8.dp else 0.dp
     val horizontalPadding = if (isGameOver) 32.dp else 0.dp
     val textSize = if (isGameOver) 25.sp else 45.sp
-
     val textScale by animateFloatAsState(
         targetValue = if (isPressed) 0.88f else 1f,
         animationSpec = tween(durationMillis = 100),
@@ -227,13 +244,14 @@ fun AnimatedButton(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier // Застосовуємо переданий модифікатор до цього Box
+        modifier = modifier
+
     ) {
         Image(
             painter = painterResource(buttonImage),
             contentDescription = "Button",
             modifier = Modifier
-                .scale(animatedScale) // Внутрішнє масштабування для анімації натискання
+                .scale(animatedScale)
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onPress = {
@@ -260,7 +278,7 @@ fun AnimatedButton(
             fontSize = textSize,
             color = Color.White,
             modifier = Modifier
-                .scale(textScale * scale / 2.5f) // Масштабування тексту
+                .scale(textScale * scale / 2.5f)
                 .padding(bottom = verticalPadding, end = horizontalPadding)
         )
     }
@@ -269,8 +287,7 @@ fun AnimatedButton(
 @Preview
 @Composable
 fun MenuScreenPreview() {
-    val navController = rememberNavController(
+    val navController = rememberNavController()
 
-    )
-    MenuScreen(navController)
+    MenuScreen(navController = navController)
 }

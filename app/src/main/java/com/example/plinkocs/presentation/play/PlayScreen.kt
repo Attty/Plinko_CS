@@ -73,7 +73,7 @@ fun PlayScreen(modifier: Modifier = Modifier, navController: NavController) {
         val screenWidth = this.maxWidth
 
         val wd_paddingHorizontal = screenWidth * 0.082f
-        val wd_imageOffsetY = screenHeight * -0.005f
+        val wd_imageOffsetY = screenHeight * -0.115f
         val wd_cardPaddingTop = screenHeight * 0.0375f
         val wd_columnPaddingVertical = screenHeight * 0.065f
         val wd_earnTextPaddingStart = screenWidth * 0.0615f
@@ -219,15 +219,17 @@ fun WinDialogCard(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(horizontal = paddingHorizontal)
-                .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) {},
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }) {},
             contentAlignment = Alignment.TopCenter
         ) {
             Image(
-                painter = painterResource(R.drawable.play_game_over),
+                painter = painterResource(R.drawable.play_result_text),
                 contentDescription = "Game Over Status",
                 modifier = Modifier
                     .zIndex(1f)
-                    .scale(0.9f)
+                    .scale(0.5f)
                     .offset(y = imageOffsetY)
             )
             Card(
@@ -257,7 +259,10 @@ fun WinDialogCard(
                                 text = "Earn:",
                                 fontFamily = kickflipFont, fontSize = 54.sp, color = Color.White,
                                 maxLines = 1, overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(start = earnTextPaddingStart, bottom = earnTextPaddingBottom)
+                                modifier = Modifier.padding(
+                                    start = earnTextPaddingStart,
+                                    bottom = earnTextPaddingBottom
+                                )
                             )
                             Spacer(modifier = Modifier.width(spacer1Width))
                             InfoWindow(
@@ -392,12 +397,20 @@ private fun GameZone(
 
 @Composable
 private fun BetZone(
-    gameState: PlinkoGameState, onPlayClicked: () -> Unit, onBetChanged: (Int) -> Unit, modifier: Modifier = Modifier,
-    paddingHorizontal: Dp, paddingTop: Dp, paddingBottom: Dp,
-    rowPaddingHorizontal: Dp, rowPaddingVertical: Dp,
-    betTextPaddingBottom: Dp, betTextPaddingTop: Dp,
+    gameState: PlinkoGameState,
+    onPlayClicked: () -> Unit,
+    onBetChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    paddingHorizontal: Dp,
+    paddingTop: Dp,
+    paddingBottom: Dp,
+    rowPaddingHorizontal: Dp,
+    rowPaddingVertical: Dp,
+    betTextPaddingBottom: Dp,
+    betTextPaddingTop: Dp,
     betButtonsColumnPaddingBottom: Dp,
-    buttonsVerticalSpacing: Dp, buttonsHorizontalSpacing: Dp,
+    buttonsVerticalSpacing: Dp,
+    buttonsHorizontalSpacing: Dp,
     columnSpacerWidth: Dp
 ) {
     val betAmounts = listOf(50, 100, 200, 500)
@@ -431,7 +444,10 @@ private fun BetZone(
                     text = "Your Bet: ${gameState.currentBet}",
                     fontFamily = kickflipFont, fontSize = 18.sp, color = Color.White,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = betTextPaddingBottom, top = betTextPaddingTop)
+                    modifier = Modifier.padding(
+                        bottom = betTextPaddingBottom,
+                        top = betTextPaddingTop
+                    )
                 )
 
                 Column(
@@ -447,7 +463,9 @@ private fun BetZone(
                             AnimatedButton(
                                 text = "$amount", buttonImage = R.drawable.play_bet_button,
                                 onClick = { onBetChanged(amount) }, scale = 2f,
-                                modifier = Modifier.weight(1f).aspectRatio(2.2f)
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(2.2f)
                             )
                         }
                     }
@@ -459,7 +477,9 @@ private fun BetZone(
                             AnimatedButton(
                                 text = "$amount", buttonImage = R.drawable.play_bet_button,
                                 onClick = { onBetChanged(amount) }, scale = 2f,
-                                modifier = Modifier.weight(1f).aspectRatio(2.2f)
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(2.2f)
                             )
                         }
                     }
@@ -469,13 +489,17 @@ private fun BetZone(
             Spacer(modifier = Modifier.width(columnSpacerWidth))
 
             Box(
-                modifier = Modifier.weight(0.32f).fillMaxHeight(0.75f),
+                modifier = Modifier
+                    .weight(0.32f)
+                    .fillMaxHeight(0.75f),
                 contentAlignment = Alignment.Center
             ) {
                 AnimatedButton(
                     text = "Play", buttonImage = R.drawable.play_play_button,
                     onClick = onPlayClicked, scale = 2.5f,
-                    modifier = Modifier.fillMaxSize().aspectRatio(0.9f, matchHeightConstraintsFirst = false)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .aspectRatio(0.9f, matchHeightConstraintsFirst = false)
                 )
             }
         }
